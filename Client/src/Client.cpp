@@ -1,17 +1,13 @@
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/buffer.hpp>
 
 #include "Client.hpp"
 
 Client::Client(boost::asio::io_service& ioService)
-    : _tcpSocket(ioService), _headerRead(false), _tcpBuffer(NULL)
+    : _tcpSocket(ioService)
 {
 }
 
 Client::~Client() {
-    delete [] _tcpBuffer;
-
     boost::system::error_code ignoredErrorCode;
     _tcpSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignoredErrorCode);
     _tcpSocket.close(ignoredErrorCode);
@@ -29,12 +25,14 @@ void Client::connect(const tcp::endpoint& peerEndpoint) {
 
 void Client::connectHandler(const boost::system::error_code& error) {
     if (! error) {
+        uint32_t contentSize;
         boost::asio::async_read(_tcpSocket,
-                                boost::asio::buffer(&_readSize, sizeof(int)), //sizeof(int) differs over plattforms; endianess(!)
+                                boost::asio::buffer(&contentSize, sizeof(uint32_t)), //sizeof(int) differs on plattforms; endianess(!)
+                                boost::asio::transfer_exactly(sizeof(uint32_t)),
                                 boost::bind(
-                                    &Client::tcpReadHandler, this,
+                                    &Client::tcpReadSizeHandler, this,
                                     boost::asio::placeholders::error,
-                                    boost::asio::placeholders::bytes_transferred
+                                    contentSize
                                     )
                                 );
 	}
@@ -43,18 +41,19 @@ void Client::connectHandler(const boost::system::error_code& error) {
     }
 }
 
-void Client::tcpReadSizeHandler(const boost::system::error_code& error, std::size_t bytes_transferred) {
+void Client::tcpReadSizeHandler(const boost::system::error_code& error, uint32_t contentSize) {
     if (! error) {
-        _tcpBuffer = new char[_readSize];
+        boost::shared_array<char> tcpBuffer(new char[contentSize]);
 
         boost::asio::async_read(_tcpSocket,
-                                boost::asio::buffer(_tcpBuffer, _readSize),
-                                boost::asio::transfer_exactly(_readSize),
+                                boost::asio::buffer(tcpBuffer.get(), contentSize),
+                                boost::asio::transfer_exactly(contentSize),
                                 boost::bind(
                                     &Client::tcpReadHandler,
                                     this,
                                     boost::asio::placeholders::error,
-                                    boost::asio::placeholders::bytes_transferred
+                                    boost::asio::placeholders::bytes_transferred,
+                                    tcpBuffer
                                     )
                                 );
     } else {
@@ -62,7 +61,7 @@ void Client::tcpReadSizeHandler(const boost::system::error_code& error, std::siz
     }
 }
 
-void Client::tcpReadHandler(const boost::system::error_code &error, std::size_t bytes_transferred) {
+void Client::tcpReadHandler(const boost::system::error_code &error, std::size_t bytesTransferred, boost::shared_array<char> buffer) {
     if (! error) {
         //do something with your recieved data here
     } else {
@@ -70,11 +69,7 @@ void Client::tcpReadHandler(const boost::system::error_code &error, std::size_t 
     }
 }
 
-void Client::tcpBufferReceived(void) {
-	std::cout << _readSize << std::endl;
-}
-
-void Client::tcpWriteHandler(const boost::system::error_code& error, std::size_t bytes_transferred) {
+void Client::tcpWriteHandler(const boost::system::error_code& error, std::size_t bytesTransferred) {
     if (! error) {
         // eventually start recieving again or do what ever you want...
     } else {
@@ -82,7 +77,7 @@ void Client::tcpWriteHandler(const boost::system::error_code& error, std::size_t
     }
 }
 
-void Client::tcpWrite(int size, void* data) {
+void Client::tcpWrite(boost::shared_array<char> data, std::size_t size) {
 
 }
 

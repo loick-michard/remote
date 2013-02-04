@@ -1,8 +1,8 @@
 #ifndef _CLIENT_HPP_
-# define _CLIENT_HPP_
+#define _CLIENT_HPP_
 
-# include <boost/asio.hpp>
-# include <queue>
+#include <boost/shared_array.hpp>
+#include <boost/asio.hpp>
 
 using namespace boost::asio::ip;
 
@@ -14,17 +14,13 @@ public:
     void connect(const tcp::endpoint& peerEndpoint);
 private:
     void connectHandler(const boost::system::error_code& error);
-    void tcpReadSizeHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
-    void tcpReadHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
-    void tcpBufferReceived(void);
+    void tcpReadSizeHandler(const boost::system::error_code& error, uint32_t contentSize);
+    void tcpReadHandler(const boost::system::error_code& error, std::size_t bytes_transferred, boost::shared_array<char> buffer);
     void tcpWriteHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
-    void tcpWrite(int size = -1, void* data = NULL);
+    void tcpWrite(boost::shared_array<char> data, std::size_t size);
     void printError(const boost::system::error_code& error);
 
 	tcp::socket	_tcpSocket;
-	int			_readSize;
-	bool		_headerRead;
-	char*		_tcpBuffer;
 };
 
 #endif

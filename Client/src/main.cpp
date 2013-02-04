@@ -1,5 +1,7 @@
 #include <iostream>
-#include <boost/asio.hpp>
+
+#include <boost/asio/io_service.hpp>
+
 #include "Client.hpp"
 
 using namespace boost::asio::ip;
@@ -9,10 +11,15 @@ int main(int argc, char** argv) {
         boost::asio::io_service	ioService;
 
         Client client(ioService);
-        tcp::endpoint endpoint(address::from_string(argv[1]), std::atoi(argv[2]));
-        client.connect(endpoint);
 
-		ioService.run();
+        try {
+            tcp::endpoint endpoint(address::from_string(argv[1]), std::atoi(argv[2]));
+            client.connect(endpoint);
+
+            ioService.run();
+        } catch (boost::system::system_error& error) {
+            std::cerr << "Main: Error " << error.what() << std::endl;
+        }
 	}
 	else
 		std::cerr << "Usage: ./Client adress port" << std::endl;
