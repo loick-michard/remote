@@ -3,6 +3,8 @@
 
 # include <boost/asio.hpp>
 # include <queue>
+# include "WriteStream.hpp"
+
 using namespace boost::asio::ip;
 
 class Client {
@@ -14,15 +16,13 @@ public:
 	void connectHandler(const boost::system::error_code&);
 	void tcpReadHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
 	void tcpBufferReceived(void);
-	void tcpWriteHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
 	void tcpWrite(int size = -1, void* data = NULL);
 private:
 	tcp::socket	_tcpSocket;
 	int			_readSize;
 	bool		_headerRead;
 	char*		_tcpBuffer;
-
-//	std::queue<
+	WriteStream<tcp::socket>	_tcpWriteStream;
 };
 
 #endif

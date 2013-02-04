@@ -4,7 +4,7 @@
 #include <boost/asio/buffer.hpp>
 
 Client::Client(boost::asio::io_service& ioService) : 
-	_tcpSocket(ioService), _headerRead(false), _tcpBuffer(NULL) {
+	_tcpSocket(ioService), _headerRead(false), _tcpBuffer(NULL), _tcpWriteStream(&_tcpSocket) {
 
 }
 
@@ -21,7 +21,7 @@ void Client::connectHandler(const boost::system::error_code& error) {
 		throw new std::exception("Can't connect");
 	}
 	else {
-
+		_tcpWriteStream.write(5, "salut");
 		boost::asio::async_read(_tcpSocket, boost::asio::buffer(&_readSize, sizeof(int)), boost::bind(&Client::tcpReadHandler, this, _1, _2));
 	}
 }
@@ -48,10 +48,6 @@ void Client::tcpBufferReceived(void) {
 	std::cout << _readSize << std::endl;
 }
 
-void Client::tcpWriteHandler(const boost::system::error_code& error, std::size_t bytes_transferred) {
-
-}
-
 void Client::tcpWrite(int size, void* data) {
-
+	_tcpWriteStream.write(size, data);
 }
