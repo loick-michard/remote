@@ -16,6 +16,7 @@ SET (REMOTE_SERVER_BUNDLE_PATH ${REMOTE_BUNDLES_PATH}/Server)
 
 set(Boost_USE_STATIC_LIBS        ON)
 find_package(Boost 1.40.0 REQUIRED COMPONENTS system date_time regex)  
+find_package(Threads)
 
 #
 # Include Directories
@@ -109,12 +110,14 @@ ENDFOREACH ()
 TARGET_LINK_LIBRARIES (
     Client
     ${Boost_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
 )
 
 
 TARGET_LINK_LIBRARIES (
     Server
     ${Boost_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
 )
 
 #
