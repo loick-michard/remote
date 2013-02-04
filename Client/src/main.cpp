@@ -8,7 +8,6 @@ int main(int argc, char** argv) {
 	try {
 	if (argc == 3) {
 		boost::asio::io_service			ioService;
-		tcp::resolver					resolver(ioService);
 
 		Client client(ioService);
 		tcp::endpoint endpoint(address::from_string(argv[1]), std::atoi(argv[2]));
