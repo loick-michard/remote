@@ -14,6 +14,8 @@ SET (REMOTE_SERVER_BUNDLE_PATH ${REMOTE_BUNDLES_PATH}/Server)
 # Dependencies
 #
 
+set(Boost_USE_STATIC_LIBS        ON)
+find_package(Boost 1.40.0 REQUIRED COMPONENTS system date_time regex)  
 
 #
 # Include Directories
@@ -22,7 +24,7 @@ SET (REMOTE_SERVER_BUNDLE_PATH ${REMOTE_BUNDLES_PATH}/Server)
 INCLUDE_DIRECTORIES (
     ${CMAKE_SOURCE_DIR}/Client/src
     ${CMAKE_SOURCE_DIR}/Server/src
-    ${GLEW_INCLUDE_DIR}
+    ${Boost_INCLUDE_DIR}
 )
 
 #
@@ -106,11 +108,13 @@ ENDFOREACH ()
 
 TARGET_LINK_LIBRARIES (
     Client
+    ${Boost_LIBRARIES}
 )
 
 
 TARGET_LINK_LIBRARIES (
     Server
+    ${Boost_LIBRARIES}
 )
 
 #
