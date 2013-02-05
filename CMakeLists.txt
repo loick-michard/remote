@@ -26,6 +26,7 @@ SET (
 set(Boost_USE_STATIC_LIBS        ON)
 find_package(Boost 1.40.0 REQUIRED COMPONENTS system date_time regex)
 find_package(LibVLC REQUIRED)
+find_package(SFML COMPONENTS system window graphics REQUIRED)
 
 #
 # Include Directories
@@ -35,7 +36,8 @@ INCLUDE_DIRECTORIES (
     ${CMAKE_SOURCE_DIR}/Client/src
     ${CMAKE_SOURCE_DIR}/Server/src
     ${Boost_INCLUDE_DIR}
-	${LIBVLC_INCLUDE_DIR}
+    ${LIBVLC_INCLUDE_DIR}
+    ${SFML_INCLUDE_DIR}
 )
 
 #
@@ -120,7 +122,8 @@ ENDFOREACH ()
 TARGET_LINK_LIBRARIES (
     Client
     ${Boost_LIBRARIES}
-	${LIBVLC_LIBRARY}
+    ${LIBVLC_LIBRARY}
+    ${SFML_LIBRARIES}
 )
 
 
