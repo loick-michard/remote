@@ -21,7 +21,10 @@ void Client::connectHandler(const boost::system::error_code& error) {
 		throw new std::exception("Can't connect");
 	}
 	else {
-		_tcpWriteStream.write(5, "salut");
+		std::cout << "Connection success" << std::endl;
+		int size = 5;
+		tcpWrite(sizeof(int), &size);
+		tcpWrite(5, "salut");
 		boost::asio::async_read(_tcpSocket, boost::asio::buffer(&_readSize, sizeof(int)), boost::bind(&Client::tcpReadHandler, this, _1, _2));
 	}
 }

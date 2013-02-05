@@ -3,6 +3,7 @@
 
 # include <boost/asio.hpp>
 # include <boost/bind.hpp>
+# include <queue>
 
 template <typename T>
 class WriteStream {
@@ -22,9 +23,8 @@ public:
 		}
 	}
 
-	void writeHandler(const boost::system::error_code& error, size_t size) {
+	void writeHandler(const boost::system::error_code& error, size_t) {
 		if (!error) {
-			std::cout << "Writing " << size << std::endl;
 			_writing = false;
 			delete [] _toWrite.front().second;
 			_toWrite.pop();
@@ -33,7 +33,7 @@ public:
 	}
 private:
 	T*										_object;
-	std::queue<std::pair<int, char*>>		_toWrite;
+	std::queue<std::pair<int, char*> >		_toWrite;
 	bool									_writing;
 };
 
