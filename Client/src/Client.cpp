@@ -2,6 +2,7 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/buffer.hpp>
+#include <iostream>
 
 Client::Client(boost::asio::io_service& ioService) : 
 	_tcpSocket(ioService), _headerRead(false), _tcpBuffer(NULL), _tcpWriteStream(&_tcpSocket) {
@@ -18,13 +19,13 @@ void Client::connect(const tcp::endpoint& peerEndpoint) {
 
 void Client::connectHandler(const boost::system::error_code& error) {
 	if (error) {
-		throw new std::exception("Can't connect");
+		//throw new std::exception("Can't connect");
+		std::cout << "Can't connect" << std::endl;
+		system("pause");
+		exit(-1);
 	}
 	else {
 		std::cout << "Connection success" << std::endl;
-		int size = 5;
-		tcpWrite(sizeof(int), &size);
-		tcpWrite(5, "salut");
 		boost::asio::async_read(_tcpSocket, boost::asio::buffer(&_readSize, sizeof(int)), boost::bind(&Client::tcpReadHandler, this, _1, _2));
 	}
 }
@@ -47,8 +48,12 @@ void Client::tcpReadHandler(const boost::system::error_code& error, std::size_t 
 	}
 }
 
+int loop(const std::string& url);
+
 void Client::tcpBufferReceived(void) {
-	std::cout << _readSize << std::endl;
+	std::string str(_tcpBuffer, _readSize);
+	std::cout << "Connecting to " << str << std::endl;
+	loop(str);
 }
 
 void Client::tcpWrite(int size, void* data) {
