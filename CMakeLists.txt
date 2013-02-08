@@ -11,11 +11,21 @@ SET (REMOTE_CLIENT_BUNDLE_PATH ${REMOTE_BUNDLES_PATH}/Client)
 SET (REMOTE_SERVER_BUNDLE_PATH ${REMOTE_BUNDLES_PATH}/Server)
 
 #
+# CMake config
+#
+
+SET (
+	CMAKE_MODULE_PATH
+	${CMAKE_SOURCE_DIR}/CMakeModules ${CMAKE_MODULE_PATH}
+)
+
+#
 # Dependencies
 #
 
 set(Boost_USE_STATIC_LIBS        ON)
-find_package(Boost 1.40.0 REQUIRED COMPONENTS system date_time regex)  
+find_package(Boost 1.40.0 REQUIRED COMPONENTS system date_time regex)
+find_package(LibVLC REQUIRED)
 
 #
 # Include Directories
@@ -25,6 +35,7 @@ INCLUDE_DIRECTORIES (
     ${CMAKE_SOURCE_DIR}/Client/src
     ${CMAKE_SOURCE_DIR}/Server/src
     ${Boost_INCLUDE_DIR}
+	${LIBVLC_INCLUDE_DIR}
 )
 
 #
@@ -109,6 +120,7 @@ ENDFOREACH ()
 TARGET_LINK_LIBRARIES (
     Client
     ${Boost_LIBRARIES}
+	${LIBVLC_LIBRARY}
 )
 
 
